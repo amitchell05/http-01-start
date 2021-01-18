@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
@@ -29,11 +29,19 @@ export class PostsService {
   }
 
   fetchPosts() {
+    let searchParams = new HttpParams();
+
+    // Prints the Response in the Network tab in a prettier way
+    searchParams = searchParams.append('print', 'pretty');
+    // Not supported by Firebase (he made it up)
+    searchParams = searchParams.append('custom', 'key');
+
     return this.http
       .get<{ [key: string]: Post }>(
         'https://ng-complete-guide-23686-default-rtdb.firebaseio.com/posts.json',
         {
           headers: new HttpHeaders({ 'Custom-Header': 'Hello' }),
+          params: searchParams,
         }
       )
       .pipe(
