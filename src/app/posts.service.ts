@@ -6,7 +6,7 @@ import {
 } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Subject, throwError } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
+import { map, catchError, tap, mergeMap } from 'rxjs/operators';
 
 import { Post } from './post.model';
 
@@ -18,7 +18,7 @@ export class PostsService {
 
   createAndStorePost(title: string, content: string) {
     const postData: Post = { title: title, content: content };
-    this.http
+    return this.http
       .post<{ name: string }>(
         'https://ng-complete-guide-23686-default-rtdb.firebaseio.com/posts.json',
         postData,
@@ -26,14 +26,7 @@ export class PostsService {
           observe: 'response',
         }
       )
-      .subscribe(
-        (responseData) => {
-          console.log(responseData);
-        },
-        (error) => {
-          this.error.next(error.message);
-        }
-      );
+      .pipe(mergeMap(() => this.fetchPosts()));
   }
 
   fetchPosts() {
